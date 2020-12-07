@@ -1,0 +1,270 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<title>QC</title>
+		<link rel="stylesheet" href="reveal.js/dist/reset.css">
+		<link rel="stylesheet" href="reveal.js/dist/reveal.css">
+		<link rel="stylesheet" href="reveal.js/dist/theme/night.css" id="theme">
+		<link rel="stylesheet" href="reveal.js/dist/user.css">
+
+		<!-- Theme used for syntax highlighted code -->
+		<link rel="stylesheet" href="reveal.js/plugin/highlight/monokai.css" id="highlight-theme">
+		<script type="text/javascript" src="https://code.highcharts.com/highcharts.js"></script>
+		<script src="https://code.highcharts.com/highcharts-more.js"></script>
+		<script src="https://code.highcharts.com/modules/sankey.js"></script>
+		<script src="https://code.highcharts.com/modules/heatmap.js"></script>
+		<script src="https://code.highcharts.com/modules/exporting.js"></script>
+		<script src="http://code.highcharts.com/gantt/modules/networkgraph.js"></script>
+		<script type="text/javascript" src="js/high-contrast-dark.js"></script>
+		<script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css">
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.16.2/build/styles/monokai-sublime.min.css">
+		<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.16.2/build/highlight.min.js"></script>
+		<script type="text/javascript" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+		</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section>
+					<h2>Day 2 - Transcriptome Assembly</h2>
+					<p>Bastian Schiffthaler, Nicolas Delhomme</p>
+					<p>And <strong style="text-decoration: underline;">a lot</strong> of content courtesy of Matt MacManes (@macmanes)</p>
+					<p>Berlin, November 12th 2019</p>
+				</section>
+				<section>
+					<h4>Overview</h4>
+					<ul>
+						<li>Study Design</li>
+						<li>Sample Collection and Preservation</li>
+						<li>Library Generation</li>
+						<li>[Sequencing and Raw Data QC]</li>
+						<li>Assembly</li>
+					</ul>
+				</section>
+				<section>
+					<h4>Why assemble a transcriptome</h4>
+					<ul>
+						<li class="fragment">You don't have a reference</li>
+						<li class="fragment">The current reference is hot garbage</li>
+						<li class="fragment">Your specific genes are missing</li>
+						<li class="fragment">You trust no one and want to QC an existing reference</li>
+					</ul>
+				</section>
+				<section>
+					<h4>Goal for today</h4>
+					<p class="fragment">You could plan or assist in the design and computational aspects of a transcriptome assembly study.</p>
+					<p class="fragment">You are informed about options/tools for short read assembly</p>
+				</section>
+				<section>
+					<section>
+						<h4>The burden of choice</h4>
+						<iframe class="stretch" data-src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTUjYzsEpOHgzAY8dbFwQA76faQCT2BFtwLtOMfuTbeNzu9LKqjJ5qQnKgAOpdjs4uegti7gvkY-His/pubhtml?gid=1446854304&amp;single=true&amp;widget=false&amp;headers=true"></iframe>
+					</section>
+					<section>
+						<h4>Which Platform</h4>
+						<table id="platform-comp" class="medium">
+							<thead>
+								<tr><td>Platform</td><td>Throughput</td><td>Accuracy</td><td>ReadLength</td><td>Molecule</td><td>Cost</td></tr>
+							</thead>
+							<tbody>
+								<tr><td>Illumina</td><td>High</td><td>High</td><td>Short</td><td>cDNA</td><td>Low (excl. machine)</td></tr>
+								<tr><td>PacBio</td><td>Med</td><td>Med (high?)</td><td>Long</td><td>cDNA</td><td>High</td></tr>
+								<tr><td>Nanopore</td><td>Low</td><td>Med</td><td>Longer</td><td>RNA/cDNA</td><td>Low(ish)</td></tr>
+							</tbody>
+						</table>
+					</section>
+					<section>
+						<h4>Which Platform</h4>
+						<table id="platform-comp2" class="medium">
+							<thead>
+								<tr><td>Platform</td><td>Ideal Use</td></tr>
+							</thead>
+							<tbody>
+								<tr><td>Illumina</td><td>Quantification/DE</td></tr>
+								<tr><td>PacBio</td><td>Assembly</td></tr>
+								<tr><td>Nanopore</td><td>Assembly/nt modification</td></tr>
+							</tbody>
+						</table>
+					</section>
+					<section>
+						<h4>Replication</h4>
+						<ul>
+							<li class="fragment">Technical replicates aren't essential. They are well modeled by the poisson distribution.</li>
+							<li class="fragment">Biological replicates are essential (esp. for DE)</li>
+						</ul>
+						<div class="fragment">
+						<p><span style="font-style: italic;">“... at least six biological replicates should be used, rising to at least 12 when it is important to identify SDE genes for all fold changes.”</span></p>
+						<p class="citation">Marioni, John C., et al. "RNA-seq: an assessment of technical reproducibility and comparison with gene expression arrays." Genome research 18.9 (2008): 1509-1517.</p>
+						<p class="citation">Schurch, Nicholas J., et al. "How many biological replicates are needed in an RNA-seq experiment and which differential expression tool should you use?." Rna 22.6 (2016): 839-851.</p>
+						</div>
+					</section>
+					<section>
+						<h4>Replication</h4>
+						<p class="lead warn">For assembly, use one individual or one per treatment!</p>
+					</section>
+				</section>
+				<section>
+					<section>
+						<h4>Sample Collection and Preservation</h4>
+						<ul>
+							<li class="fragment">Transcription changes quickly and may not stop at death</li>
+							<li class="fragment">RNA degrades (fast)</li>
+							<li class="fragment">The specifics are taxon specific, so talk with an expert</li>
+						</ul>
+					</section>
+				</section>
+				<section>
+					<section>
+						<h4>Library QC</h4>
+						<p>Gel electrophoresis or BioAnalyzer</p>
+						<p>
+						<img style="width: 40%; float: right;" class="img-right" data-src="img/rin.png">
+						<img style="width: 20%; float: left;" class="img-left" data-src="img/ba.png">
+						</p>
+					</section>
+				</section>
+				<section>
+					<section>
+						<h4>Preprocessing: Diginorm</h4>
+						<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1651 792"><title>Diginorm</title><rect x="41.5" y="362.5" width="697" height="51" style="fill:#ff7bac"/><path d="M826,477v50H130V477H826m1-1H129v52H827V476Z" transform="translate(-88 -114)"/><rect x="41.5" y="550.5" width="697" height="51" style="fill:#ff7bac"/><path d="M826,665v50H130V665H826m1-1H129v52H827V664Z" transform="translate(-88 -114)"/><rect x="41.5" y="738.5" width="697" height="51" style="fill:#ff7bac"/><path d="M826,853v50H130V853H826m1-1H129v52H827V852Z" transform="translate(-88 -114)"/><rect x="24.5" y="308.5" width="70" height="15" style="fill:#fff"/><path d="M182,423v14H113V423h69m1-1H112v16h71V422Z" transform="translate(-88 -114)"/><rect x="110.5" y="308.5" width="70" height="15" style="fill:#fff"/><path d="M268,423v14H199V423h69m1-1H198v16h71V422Z" transform="translate(-88 -114)"/><rect x="197.5" y="308.5" width="70" height="15" style="fill:#fff"/><path d="M355,423v14H286V423h69m1-1H285v16h71V422Z" transform="translate(-88 -114)"/><rect x="285.5" y="308.5" width="70" height="15" style="fill:#fff"/><path d="M443,423v14H374V423h69m1-1H373v16h71V422Z" transform="translate(-88 -114)"/><rect x="383.5" y="308.5" width="70" height="15" style="fill:#fff"/><path d="M541,423v14H472V423h69m1-1H471v16h71V422Z" transform="translate(-88 -114)"/><rect x="480.5" y="308.5" width="70" height="15" style="fill:#fff"/><path d="M638,423v14H569V423h69m1-1H568v16h71V422Z" transform="translate(-88 -114)"/><rect x="573.5" y="308.5" width="70" height="15" style="fill:#fff"/><path d="M731,423v14H662V423h69m1-1H661v16h71V422Z" transform="translate(-88 -114)"/><rect x="659.5" y="308.5" width="70" height="15" style="fill:#fff"/><path d="M817,423v14H748V423h69m1-1H747v16h71V422Z" transform="translate(-88 -114)"/><rect x="73.5" y="280.5" width="70" height="15" style="fill:#fff"/><path d="M231,395v14H162V395h69m1-1H161v16h71V394Z" transform="translate(-88 -114)"/><rect x="159.5" y="280.5" width="70" height="15" style="fill:#fff"/><path d="M317,395v14H248V395h69m1-1H247v16h71V394Z" transform="translate(-88 -114)"/><rect x="246.5" y="280.5" width="70" height="15" style="fill:#fff"/><path d="M404,395v14H335V395h69m1-1H334v16h71V394Z" transform="translate(-88 -114)"/><rect x="334.5" y="280.5" width="70" height="15" style="fill:#fff"/><path d="M492,395v14H423V395h69m1-1H422v16h71V394Z" transform="translate(-88 -114)"/><rect x="432.5" y="280.5" width="70" height="15" style="fill:#fff"/><path d="M590,395v14H521V395h69m1-1H520v16h71V394Z" transform="translate(-88 -114)"/><rect x="529.5" y="280.5" width="70" height="15" style="fill:#fff"/><path d="M687,395v14H618V395h69m1-1H617v16h71V394Z" transform="translate(-88 -114)"/><rect x="622.5" y="280.5" width="70" height="15" style="fill:#fff"/><path d="M780,395v14H711V395h69m1-1H710v16h71V394Z" transform="translate(-88 -114)"/><rect x="708.5" y="280.5" width="70" height="15" style="fill:#fff"/><path d="M866,395v14H797V395h69m1-1H796v16h71V394Z" transform="translate(-88 -114)"/><rect x="20.5" y="252.5" width="70" height="15" style="fill:#fff"/><path d="M178,367v14H109V367h69m1-1H108v16h71V366Z" transform="translate(-88 -114)"/><rect x="106.5" y="252.5" width="70" height="15" style="fill:#fff"/><path d="M264,367v14H195V367h69m1-1H194v16h71V366Z" transform="translate(-88 -114)"/><rect x="193.5" y="252.5" width="70" height="15" style="fill:#fff"/><path d="M351,367v14H282V367h69m1-1H281v16h71V366Z" transform="translate(-88 -114)"/><rect x="281.5" y="252.5" width="70" height="15" style="fill:#fff"/><path d="M439,367v14H370V367h69m1-1H369v16h71V366Z" transform="translate(-88 -114)"/><rect x="379.5" y="252.5" width="70" height="15" style="fill:#fff"/><path d="M537,367v14H468V367h69m1-1H467v16h71V366Z" transform="translate(-88 -114)"/><rect x="476.5" y="252.5" width="70" height="15" style="fill:#fff"/><path d="M634,367v14H565V367h69m1-1H564v16h71V366Z" transform="translate(-88 -114)"/><rect x="569.5" y="252.5" width="70" height="15" style="fill:#fff"/><path d="M727,367v14H658V367h69m1-1H657v16h71V366Z" transform="translate(-88 -114)"/><rect x="655.5" y="252.5" width="70" height="15" style="fill:#fff"/><path d="M813,367v14H744V367h69m1-1H743v16h71V366Z" transform="translate(-88 -114)"/><rect x="52.5" y="224.5" width="70" height="15" style="fill:#fff"/><path d="M210,339v14H141V339h69m1-1H140v16h71V338Z" transform="translate(-88 -114)"/><rect x="138.5" y="224.5" width="70" height="15" style="fill:#fff"/><path d="M296,339v14H227V339h69m1-1H226v16h71V338Z" transform="translate(-88 -114)"/><rect x="225.5" y="224.5" width="70" height="15" style="fill:#fff"/><path d="M383,339v14H314V339h69m1-1H313v16h71V338Z" transform="translate(-88 -114)"/><rect x="313.5" y="224.5" width="70" height="15" style="fill:#fff"/><path d="M471,339v14H402V339h69m1-1H401v16h71V338Z" transform="translate(-88 -114)"/><rect x="411.5" y="224.5" width="70" height="15" style="fill:#fff"/><path d="M569,339v14H500V339h69m1-1H499v16h71V338Z" transform="translate(-88 -114)"/><rect x="508.5" y="224.5" width="70" height="15" style="fill:#fff"/><path d="M666,339v14H597V339h69m1-1H596v16h71V338Z" transform="translate(-88 -114)"/><rect x="601.5" y="224.5" width="70" height="15" style="fill:#fff"/><path d="M759,339v14H690V339h69m1-1H689v16h71V338Z" transform="translate(-88 -114)"/><rect x="687.5" y="224.5" width="70" height="15" style="fill:#fff"/><path d="M845,339v14H776V339h69m1-1H775v16h71V338Z" transform="translate(-88 -114)"/><rect x="20.5" y="196.5" width="70" height="15" style="fill:#fff"/><path d="M178,311v14H109V311h69m1-1H108v16h71V310Z" transform="translate(-88 -114)"/><rect x="106.5" y="196.5" width="70" height="15" style="fill:#fff"/><path d="M264,311v14H195V311h69m1-1H194v16h71V310Z" transform="translate(-88 -114)"/><rect x="193.5" y="196.5" width="70" height="15" style="fill:#fff"/><path d="M351,311v14H282V311h69m1-1H281v16h71V310Z" transform="translate(-88 -114)"/><rect x="281.5" y="196.5" width="70" height="15" style="fill:#fff"/><path d="M439,311v14H370V311h69m1-1H369v16h71V310Z" transform="translate(-88 -114)"/><rect x="379.5" y="196.5" width="70" height="15" style="fill:#fff"/><path d="M537,311v14H468V311h69m1-1H467v16h71V310Z" transform="translate(-88 -114)"/><rect x="476.5" y="196.5" width="70" height="15" style="fill:#fff"/><path d="M634,311v14H565V311h69m1-1H564v16h71V310Z" transform="translate(-88 -114)"/><rect x="569.5" y="196.5" width="70" height="15" style="fill:#fff"/><path d="M727,311v14H658V311h69m1-1H657v16h71V310Z" transform="translate(-88 -114)"/><rect x="655.5" y="196.5" width="70" height="15" style="fill:#fff"/><path d="M813,311v14H744V311h69m1-1H743v16h71V310Z" transform="translate(-88 -114)"/><rect x="65.5" y="168.5" width="70" height="15" style="fill:#fff"/><path d="M223,283v14H154V283h69m1-1H153v16h71V282Z" transform="translate(-88 -114)"/><rect x="151.5" y="168.5" width="70" height="15" style="fill:#fff"/><path d="M309,283v14H240V283h69m1-1H239v16h71V282Z" transform="translate(-88 -114)"/><rect x="238.5" y="168.5" width="70" height="15" style="fill:#fff"/><path d="M396,283v14H327V283h69m1-1H326v16h71V282Z" transform="translate(-88 -114)"/><rect x="326.5" y="168.5" width="70" height="15" style="fill:#fff"/><path d="M484,283v14H415V283h69m1-1H414v16h71V282Z" transform="translate(-88 -114)"/><rect x="424.5" y="168.5" width="70" height="15" style="fill:#fff"/><path d="M582,283v14H513V283h69m1-1H512v16h71V282Z" transform="translate(-88 -114)"/><rect x="521.5" y="168.5" width="70" height="15" style="fill:#fff"/><path d="M679,283v14H610V283h69m1-1H609v16h71V282Z" transform="translate(-88 -114)"/><rect x="614.5" y="168.5" width="70" height="15" style="fill:#fff"/><path d="M772,283v14H703V283h69m1-1H702v16h71V282Z" transform="translate(-88 -114)"/><rect x="700.5" y="168.5" width="70" height="15" style="fill:#fff"/><path d="M858,283v14H789V283h69m1-1H788v16h71V282Z" transform="translate(-88 -114)"/><rect x="21.5" y="140.5" width="70" height="15" style="fill:#fff"/><path d="M179,255v14H110V255h69m1-1H109v16h71V254Z" transform="translate(-88 -114)"/><rect x="107.5" y="140.5" width="70" height="15" style="fill:#fff"/><path d="M265,255v14H196V255h69m1-1H195v16h71V254Z" transform="translate(-88 -114)"/><rect x="194.5" y="140.5" width="70" height="15" style="fill:#fff"/><path d="M352,255v14H283V255h69m1-1H282v16h71V254Z" transform="translate(-88 -114)"/><rect x="282.5" y="140.5" width="70" height="15" style="fill:#fff"/><path d="M440,255v14H371V255h69m1-1H370v16h71V254Z" transform="translate(-88 -114)"/><rect x="380.5" y="140.5" width="70" height="15" style="fill:#fff"/><path d="M538,255v14H469V255h69m1-1H468v16h71V254Z" transform="translate(-88 -114)"/><rect x="477.5" y="140.5" width="70" height="15" style="fill:#fff"/><path d="M635,255v14H566V255h69m1-1H565v16h71V254Z" transform="translate(-88 -114)"/><rect x="570.5" y="140.5" width="70" height="15" style="fill:#fff"/><path d="M728,255v14H659V255h69m1-1H658v16h71V254Z" transform="translate(-88 -114)"/><rect x="656.5" y="140.5" width="70" height="15" style="fill:#fff"/><path d="M814,255v14H745V255h69m1-1H744v16h71V254Z" transform="translate(-88 -114)"/><rect x="70.5" y="112.5" width="70" height="15" style="fill:#fff"/><path d="M228,227v14H159V227h69m1-1H158v16h71V226Z" transform="translate(-88 -114)"/><rect x="156.5" y="112.5" width="70" height="15" style="fill:#fff"/><path d="M314,227v14H245V227h69m1-1H244v16h71V226Z" transform="translate(-88 -114)"/><rect x="243.5" y="112.5" width="70" height="15" style="fill:#fff"/><path d="M401,227v14H332V227h69m1-1H331v16h71V226Z" transform="translate(-88 -114)"/><rect x="331.5" y="112.5" width="70" height="15" style="fill:#fff"/><path d="M489,227v14H420V227h69m1-1H419v16h71V226Z" transform="translate(-88 -114)"/><rect x="429.5" y="112.5" width="70" height="15" style="fill:#fff"/><path d="M587,227v14H518V227h69m1-1H517v16h71V226Z" transform="translate(-88 -114)"/><rect x="526.5" y="112.5" width="70" height="15" style="fill:#fff"/><path d="M684,227v14H615V227h69m1-1H614v16h71V226Z" transform="translate(-88 -114)"/><rect x="619.5" y="112.5" width="70" height="15" style="fill:#fff"/><path d="M777,227v14H708V227h69m1-1H707v16h71V226Z" transform="translate(-88 -114)"/><rect x="705.5" y="112.5" width="70" height="15" style="fill:#fff"/><path d="M863,227v14H794V227h69m1-1H793v16h71V226Z" transform="translate(-88 -114)"/><rect x="17.5" y="84.5" width="70" height="15" style="fill:#fff"/><path d="M175,199v14H106V199h69m1-1H105v16h71V198Z" transform="translate(-88 -114)"/><rect x="103.5" y="84.5" width="70" height="15" style="fill:#fff"/><path d="M261,199v14H192V199h69m1-1H191v16h71V198Z" transform="translate(-88 -114)"/><rect x="190.5" y="84.5" width="70" height="15" style="fill:#fff"/><path d="M348,199v14H279V199h69m1-1H278v16h71V198Z" transform="translate(-88 -114)"/><rect x="278.5" y="84.5" width="70" height="15" style="fill:#fff"/><path d="M436,199v14H367V199h69m1-1H366v16h71V198Z" transform="translate(-88 -114)"/><rect x="376.5" y="84.5" width="70" height="15" style="fill:#fff"/><path d="M534,199v14H465V199h69m1-1H464v16h71V198Z" transform="translate(-88 -114)"/><rect x="473.5" y="84.5" width="70" height="15" style="fill:#fff"/><path d="M631,199v14H562V199h69m1-1H561v16h71V198Z" transform="translate(-88 -114)"/><rect x="566.5" y="84.5" width="70" height="15" style="fill:#fff"/><path d="M724,199v14H655V199h69m1-1H654v16h71V198Z" transform="translate(-88 -114)"/><rect x="652.5" y="84.5" width="70" height="15" style="fill:#fff"/><path d="M810,199v14H741V199h69m1-1H740v16h71V198Z" transform="translate(-88 -114)"/><rect x="49.5" y="56.5" width="70" height="15" style="fill:#fff"/><path d="M207,171v14H138V171h69m1-1H137v16h71V170Z" transform="translate(-88 -114)"/><rect x="135.5" y="56.5" width="70" height="15" style="fill:#fff"/><path d="M293,171v14H224V171h69m1-1H223v16h71V170Z" transform="translate(-88 -114)"/><rect x="222.5" y="56.5" width="70" height="15" style="fill:#fff"/><path d="M380,171v14H311V171h69m1-1H310v16h71V170Z" transform="translate(-88 -114)"/><rect x="310.5" y="56.5" width="70" height="15" style="fill:#fff"/><path d="M468,171v14H399V171h69m1-1H398v16h71V170Z" transform="translate(-88 -114)"/><rect x="408.5" y="56.5" width="70" height="15" style="fill:#fff"/><path d="M566,171v14H497V171h69m1-1H496v16h71V170Z" transform="translate(-88 -114)"/><rect x="505.5" y="56.5" width="70" height="15" style="fill:#fff"/><path d="M663,171v14H594V171h69m1-1H593v16h71V170Z" transform="translate(-88 -114)"/><rect x="598.5" y="56.5" width="70" height="15" style="fill:#fff"/><path d="M756,171v14H687V171h69m1-1H686v16h71V170Z" transform="translate(-88 -114)"/><rect x="684.5" y="56.5" width="70" height="15" style="fill:#fff"/><path d="M842,171v14H773V171h69m1-1H772v16h71V170Z" transform="translate(-88 -114)"/><rect x="17.5" y="28.5" width="70" height="15" style="fill:#fff"/><path d="M175,143v14H106V143h69m1-1H105v16h71V142Z" transform="translate(-88 -114)"/><rect x="103.5" y="28.5" width="70" height="15" style="fill:#fff"/><path d="M261,143v14H192V143h69m1-1H191v16h71V142Z" transform="translate(-88 -114)"/><rect x="190.5" y="28.5" width="70" height="15" style="fill:#fff"/><path d="M348,143v14H279V143h69m1-1H278v16h71V142Z" transform="translate(-88 -114)"/><rect x="278.5" y="28.5" width="70" height="15" style="fill:#fff"/><path d="M436,143v14H367V143h69m1-1H366v16h71V142Z" transform="translate(-88 -114)"/><rect x="376.5" y="28.5" width="70" height="15" style="fill:#fff"/><path d="M534,143v14H465V143h69m1-1H464v16h71V142Z" transform="translate(-88 -114)"/><rect x="473.5" y="28.5" width="70" height="15" style="fill:#fff"/><path d="M631,143v14H562V143h69m1-1H561v16h71V142Z" transform="translate(-88 -114)"/><rect x="566.5" y="28.5" width="70" height="15" style="fill:#fff"/><path d="M724,143v14H655V143h69m1-1H654v16h71V142Z" transform="translate(-88 -114)"/><rect x="652.5" y="28.5" width="70" height="15" style="fill:#fff"/><path d="M810,143v14H741V143h69m1-1H740v16h71V142Z" transform="translate(-88 -114)"/><rect x="62.5" y="0.5" width="70" height="15" style="fill:#fff"/><path d="M220,115v14H151V115h69m1-1H150v16h71V114Z" transform="translate(-88 -114)"/><rect x="148.5" y="0.5" width="70" height="15" style="fill:#fff"/><path d="M306,115v14H237V115h69m1-1H236v16h71V114Z" transform="translate(-88 -114)"/><rect x="235.5" y="0.5" width="70" height="15" style="fill:#fff"/><path d="M393,115v14H324V115h69m1-1H323v16h71V114Z" transform="translate(-88 -114)"/><rect x="323.5" y="0.5" width="70" height="15" style="fill:#fff"/><path d="M481,115v14H412V115h69m1-1H411v16h71V114Z" transform="translate(-88 -114)"/><rect x="421.5" y="0.5" width="70" height="15" style="fill:#fff"/><path d="M579,115v14H510V115h69m1-1H509v16h71V114Z" transform="translate(-88 -114)"/><rect x="518.5" y="0.5" width="70" height="15" style="fill:#fff"/><path d="M676,115v14H607V115h69m1-1H606v16h71V114Z" transform="translate(-88 -114)"/><rect x="611.5" y="0.5" width="70" height="15" style="fill:#fff"/><path d="M769,115v14H700V115h69m1-1H699v16h71V114Z" transform="translate(-88 -114)"/><rect x="697.5" y="0.5" width="70" height="15" style="fill:#fff"/><path d="M855,115v14H786V115h69m1-1H785v16h71V114Z" transform="translate(-88 -114)"/><rect x="32.5" y="518.5" width="70" height="15" style="fill:#fff"/><path d="M190,633v14H121V633h69m1-1H120v16h71V632Z" transform="translate(-88 -114)"/><rect x="118.5" y="518.5" width="70" height="15" style="fill:#fff"/><path d="M276,633v14H207V633h69m1-1H206v16h71V632Z" transform="translate(-88 -114)"/><rect x="205.5" y="518.5" width="70" height="15" style="fill:#fff"/><path d="M363,633v14H294V633h69m1-1H293v16h71V632Z" transform="translate(-88 -114)"/><rect x="293.5" y="518.5" width="70" height="15" style="fill:#fff"/><path d="M451,633v14H382V633h69m1-1H381v16h71V632Z" transform="translate(-88 -114)"/><rect x="391.5" y="518.5" width="70" height="15" style="fill:#fff"/><path d="M549,633v14H480V633h69m1-1H479v16h71V632Z" transform="translate(-88 -114)"/><rect x="488.5" y="518.5" width="70" height="15" style="fill:#fff"/><path d="M646,633v14H577V633h69m1-1H576v16h71V632Z" transform="translate(-88 -114)"/><rect x="581.5" y="518.5" width="70" height="15" style="fill:#fff"/><path d="M739,633v14H670V633h69m1-1H669v16h71V632Z" transform="translate(-88 -114)"/><rect x="667.5" y="518.5" width="70" height="15" style="fill:#fff"/><path d="M825,633v14H756V633h69m1-1H755v16h71V632Z" transform="translate(-88 -114)"/><rect x="0.5" y="490.5" width="70" height="15" style="fill:#fff"/><path d="M158,605v14H89V605h69m1-1H88v16h71V604Z" transform="translate(-88 -114)"/><rect x="86.5" y="490.5" width="70" height="15" style="fill:#fff"/><path d="M244,605v14H175V605h69m1-1H174v16h71V604Z" transform="translate(-88 -114)"/><rect x="173.5" y="490.5" width="70" height="15" style="fill:#fff"/><path d="M331,605v14H262V605h69m1-1H261v16h71V604Z" transform="translate(-88 -114)"/><rect x="261.5" y="490.5" width="70" height="15" style="fill:#fff"/><path d="M419,605v14H350V605h69m1-1H349v16h71V604Z" transform="translate(-88 -114)"/><rect x="359.5" y="490.5" width="70" height="15" style="fill:#fff"/><path d="M517,605v14H448V605h69m1-1H447v16h71V604Z" transform="translate(-88 -114)"/><rect x="456.5" y="490.5" width="70" height="15" style="fill:#fff"/><path d="M614,605v14H545V605h69m1-1H544v16h71V604Z" transform="translate(-88 -114)"/><rect x="549.5" y="490.5" width="70" height="15" style="fill:#fff"/><path d="M707,605v14H638V605h69m1-1H637v16h71V604Z" transform="translate(-88 -114)"/><rect x="635.5" y="490.5" width="70" height="15" style="fill:#fff"/><path d="M793,605v14H724V605h69m1-1H723v16h71V604Z" transform="translate(-88 -114)"/><rect x="45.5" y="462.5" width="70" height="15" style="fill:#fff"/><path d="M203,577v14H134V577h69m1-1H133v16h71V576Z" transform="translate(-88 -114)"/><rect x="131.5" y="462.5" width="70" height="15" style="fill:#fff"/><path d="M289,577v14H220V577h69m1-1H219v16h71V576Z" transform="translate(-88 -114)"/><rect x="218.5" y="462.5" width="70" height="15" style="fill:#fff"/><path d="M376,577v14H307V577h69m1-1H306v16h71V576Z" transform="translate(-88 -114)"/><rect x="306.5" y="462.5" width="70" height="15" style="fill:#fff"/><path d="M464,577v14H395V577h69m1-1H394v16h71V576Z" transform="translate(-88 -114)"/><rect x="404.5" y="462.5" width="70" height="15" style="fill:#fff"/><path d="M562,577v14H493V577h69m1-1H492v16h71V576Z" transform="translate(-88 -114)"/><rect x="501.5" y="462.5" width="70" height="15" style="fill:#fff"/><path d="M659,577v14H590V577h69m1-1H589v16h71V576Z" transform="translate(-88 -114)"/><rect x="594.5" y="462.5" width="70" height="15" style="fill:#fff"/><path d="M752,577v14H683V577h69m1-1H682v16h71V576Z" transform="translate(-88 -114)"/><rect x="680.5" y="462.5" width="70" height="15" style="fill:#fff"/><path d="M838,577v14H769V577h69m1-1H768v16h71V576Z" transform="translate(-88 -114)"/><rect x="37.5" y="704.5" width="70" height="15" style="fill:#fff"/><path d="M195,819v14H126V819h69m1-1H125v16h71V818Z" transform="translate(-88 -114)"/><rect x="123.5" y="704.5" width="70" height="15" style="fill:#fff"/><path d="M281,819v14H212V819h69m1-1H211v16h71V818Z" transform="translate(-88 -114)"/><rect x="210.5" y="704.5" width="70" height="15" style="fill:#fff"/><path d="M368,819v14H299V819h69m1-1H298v16h71V818Z" transform="translate(-88 -114)"/><rect x="298.5" y="704.5" width="70" height="15" style="fill:#fff"/><path d="M456,819v14H387V819h69m1-1H386v16h71V818Z" transform="translate(-88 -114)"/><rect x="396.5" y="704.5" width="70" height="15" style="fill:#fff"/><path d="M554,819v14H485V819h69m1-1H484v16h71V818Z" transform="translate(-88 -114)"/><rect x="493.5" y="704.5" width="70" height="15" style="fill:#fff"/><path d="M651,819v14H582V819h69m1-1H581v16h71V818Z" transform="translate(-88 -114)"/><rect x="586.5" y="704.5" width="70" height="15" style="fill:#fff"/><path d="M744,819v14H675V819h69m1-1H674v16h71V818Z" transform="translate(-88 -114)"/><rect x="672.5" y="704.5" width="70" height="15" style="fill:#fff"/><path d="M830,819v14H761V819h69m1-1H760v16h71V818Z" transform="translate(-88 -114)"/><rect x="913.5" y="364.5" width="697" height="51" style="fill:#ff7bac"/><path d="M1698,479v50H1002V479h696m1-1H1001v52h698V478Z" transform="translate(-88 -114)"/><rect x="913.5" y="552.5" width="697" height="51" style="fill:#ff7bac"/><path d="M1698,667v50H1002V667h696m1-1H1001v52h698V666Z" transform="translate(-88 -114)"/><rect x="913.5" y="740.5" width="697" height="51" style="fill:#ff7bac"/><path d="M1698,855v50H1002V855h696m1-1H1001v52h698V854Z" transform="translate(-88 -114)"/><rect x="896.5" y="310.5" width="70" height="15" style="fill:#fff"/><path d="M1054,425v14H985V425h69m1-1H984v16h71V424Z" transform="translate(-88 -114)"/><rect x="982.5" y="310.5" width="70" height="15" style="fill:#fff"/><path d="M1140,425v14h-69V425h69m1-1h-71v16h71V424Z" transform="translate(-88 -114)"/><rect x="1069.5" y="310.5" width="70" height="15" style="fill:#fff"/><path d="M1227,425v14h-69V425h69m1-1h-71v16h71V424Z" transform="translate(-88 -114)"/><rect x="1157.5" y="310.5" width="70" height="15" style="fill:#fff"/><path d="M1315,425v14h-69V425h69m1-1h-71v16h71V424Z" transform="translate(-88 -114)"/><rect x="1255.5" y="310.5" width="70" height="15" style="fill:#fff"/><path d="M1413,425v14h-69V425h69m1-1h-71v16h71V424Z" transform="translate(-88 -114)"/><rect x="1352.5" y="310.5" width="70" height="15" style="fill:#fff"/><path d="M1510,425v14h-69V425h69m1-1h-71v16h71V424Z" transform="translate(-88 -114)"/><rect x="1445.5" y="310.5" width="70" height="15" style="fill:#fff"/><path d="M1603,425v14h-69V425h69m1-1h-71v16h71V424Z" transform="translate(-88 -114)"/><rect x="1531.5" y="310.5" width="70" height="15" style="fill:#fff"/><path d="M1689,425v14h-69V425h69m1-1h-71v16h71V424Z" transform="translate(-88 -114)"/><rect x="945.5" y="282.5" width="70" height="15" style="fill:#fff"/><path d="M1103,397v14h-69V397h69m1-1h-71v16h71V396Z" transform="translate(-88 -114)"/><rect x="1031.5" y="282.5" width="70" height="15" style="fill:#fff"/><path d="M1189,397v14h-69V397h69m1-1h-71v16h71V396Z" transform="translate(-88 -114)"/><rect x="1118.5" y="282.5" width="70" height="15" style="fill:#fff"/><path d="M1276,397v14h-69V397h69m1-1h-71v16h71V396Z" transform="translate(-88 -114)"/><rect x="1206.5" y="282.5" width="70" height="15" style="fill:#fff"/><path d="M1364,397v14h-69V397h69m1-1h-71v16h71V396Z" transform="translate(-88 -114)"/><rect x="1304.5" y="282.5" width="70" height="15" style="fill:#fff"/><path d="M1462,397v14h-69V397h69m1-1h-71v16h71V396Z" transform="translate(-88 -114)"/><rect x="1401.5" y="282.5" width="70" height="15" style="fill:#fff"/><path d="M1559,397v14h-69V397h69m1-1h-71v16h71V396Z" transform="translate(-88 -114)"/><rect x="1494.5" y="282.5" width="70" height="15" style="fill:#fff"/><path d="M1652,397v14h-69V397h69m1-1h-71v16h71V396Z" transform="translate(-88 -114)"/><rect x="1580.5" y="282.5" width="70" height="15" style="fill:#fff"/><path d="M1738,397v14h-69V397h69m1-1h-71v16h71V396Z" transform="translate(-88 -114)"/><rect x="892.5" y="254.5" width="70" height="15" style="fill:#fff"/><path d="M1050,369v14H981V369h69m1-1H980v16h71V368Z" transform="translate(-88 -114)"/><rect x="978.5" y="254.5" width="70" height="15" style="fill:#fff"/><path d="M1136,369v14h-69V369h69m1-1h-71v16h71V368Z" transform="translate(-88 -114)"/><rect x="1065.5" y="254.5" width="70" height="15" style="fill:#fff"/><path d="M1223,369v14h-69V369h69m1-1h-71v16h71V368Z" transform="translate(-88 -114)"/><rect x="1153.5" y="254.5" width="70" height="15" style="fill:#fff"/><path d="M1311,369v14h-69V369h69m1-1h-71v16h71V368Z" transform="translate(-88 -114)"/><rect x="1251.5" y="254.5" width="70" height="15" style="fill:#fff"/><path d="M1409,369v14h-69V369h69m1-1h-71v16h71V368Z" transform="translate(-88 -114)"/><rect x="1348.5" y="254.5" width="70" height="15" style="fill:#fff"/><path d="M1506,369v14h-69V369h69m1-1h-71v16h71V368Z" transform="translate(-88 -114)"/><rect x="1441.5" y="254.5" width="70" height="15" style="fill:#fff"/><path d="M1599,369v14h-69V369h69m1-1h-71v16h71V368Z" transform="translate(-88 -114)"/><rect x="1527.5" y="254.5" width="70" height="15" style="fill:#fff"/><path d="M1685,369v14h-69V369h69m1-1h-71v16h71V368Z" transform="translate(-88 -114)"/><rect x="904.5" y="520.5" width="70" height="15" style="fill:#fff"/><path d="M1062,635v14H993V635h69m1-1H992v16h71V634Z" transform="translate(-88 -114)"/><rect x="990.5" y="520.5" width="70" height="15" style="fill:#fff"/><path d="M1148,635v14h-69V635h69m1-1h-71v16h71V634Z" transform="translate(-88 -114)"/><rect x="1077.5" y="520.5" width="70" height="15" style="fill:#fff"/><path d="M1235,635v14h-69V635h69m1-1h-71v16h71V634Z" transform="translate(-88 -114)"/><rect x="1165.5" y="520.5" width="70" height="15" style="fill:#fff"/><path d="M1323,635v14h-69V635h69m1-1h-71v16h71V634Z" transform="translate(-88 -114)"/><rect x="1263.5" y="520.5" width="70" height="15" style="fill:#fff"/><path d="M1421,635v14h-69V635h69m1-1h-71v16h71V634Z" transform="translate(-88 -114)"/><rect x="1360.5" y="520.5" width="70" height="15" style="fill:#fff"/><path d="M1518,635v14h-69V635h69m1-1h-71v16h71V634Z" transform="translate(-88 -114)"/><rect x="1453.5" y="520.5" width="70" height="15" style="fill:#fff"/><path d="M1611,635v14h-69V635h69m1-1h-71v16h71V634Z" transform="translate(-88 -114)"/><rect x="1539.5" y="520.5" width="70" height="15" style="fill:#fff"/><path d="M1697,635v14h-69V635h69m1-1h-71v16h71V634Z" transform="translate(-88 -114)"/><rect x="872.5" y="492.5" width="70" height="15" style="fill:#fff"/><path d="M1030,607v14H961V607h69m1-1H960v16h71V606Z" transform="translate(-88 -114)"/><rect x="958.5" y="492.5" width="70" height="15" style="fill:#fff"/><path d="M1116,607v14h-69V607h69m1-1h-71v16h71V606Z" transform="translate(-88 -114)"/><rect x="1045.5" y="492.5" width="70" height="15" style="fill:#fff"/><path d="M1203,607v14h-69V607h69m1-1h-71v16h71V606Z" transform="translate(-88 -114)"/><rect x="1133.5" y="492.5" width="70" height="15" style="fill:#fff"/><path d="M1291,607v14h-69V607h69m1-1h-71v16h71V606Z" transform="translate(-88 -114)"/><rect x="1231.5" y="492.5" width="70" height="15" style="fill:#fff"/><path d="M1389,607v14h-69V607h69m1-1h-71v16h71V606Z" transform="translate(-88 -114)"/><rect x="1328.5" y="492.5" width="70" height="15" style="fill:#fff"/><path d="M1486,607v14h-69V607h69m1-1h-71v16h71V606Z" transform="translate(-88 -114)"/><rect x="1421.5" y="492.5" width="70" height="15" style="fill:#fff"/><path d="M1579,607v14h-69V607h69m1-1h-71v16h71V606Z" transform="translate(-88 -114)"/><rect x="1507.5" y="492.5" width="70" height="15" style="fill:#fff"/><path d="M1665,607v14h-69V607h69m1-1h-71v16h71V606Z" transform="translate(-88 -114)"/><rect x="917.5" y="464.5" width="70" height="15" style="fill:#fff"/><path d="M1075,579v14h-69V579h69m1-1h-71v16h71V578Z" transform="translate(-88 -114)"/><rect x="1003.5" y="464.5" width="70" height="15" style="fill:#fff"/><path d="M1161,579v14h-69V579h69m1-1h-71v16h71V578Z" transform="translate(-88 -114)"/><rect x="1090.5" y="464.5" width="70" height="15" style="fill:#fff"/><path d="M1248,579v14h-69V579h69m1-1h-71v16h71V578Z" transform="translate(-88 -114)"/><rect x="1178.5" y="464.5" width="70" height="15" style="fill:#fff"/><path d="M1336,579v14h-69V579h69m1-1h-71v16h71V578Z" transform="translate(-88 -114)"/><rect x="1276.5" y="464.5" width="70" height="15" style="fill:#fff"/><path d="M1434,579v14h-69V579h69m1-1h-71v16h71V578Z" transform="translate(-88 -114)"/><rect x="1373.5" y="464.5" width="70" height="15" style="fill:#fff"/><path d="M1531,579v14h-69V579h69m1-1h-71v16h71V578Z" transform="translate(-88 -114)"/><rect x="1466.5" y="464.5" width="70" height="15" style="fill:#fff"/><path d="M1624,579v14h-69V579h69m1-1h-71v16h71V578Z" transform="translate(-88 -114)"/><rect x="1552.5" y="464.5" width="70" height="15" style="fill:#fff"/><path d="M1710,579v14h-69V579h69m1-1h-71v16h71V578Z" transform="translate(-88 -114)"/><rect x="909.5" y="706.5" width="70" height="15" style="fill:#fff"/><path d="M1067,821v14H998V821h69m1-1H997v16h71V820Z" transform="translate(-88 -114)"/><rect x="995.5" y="706.5" width="70" height="15" style="fill:#fff"/><path d="M1153,821v14h-69V821h69m1-1h-71v16h71V820Z" transform="translate(-88 -114)"/><rect x="1082.5" y="706.5" width="70" height="15" style="fill:#fff"/><path d="M1240,821v14h-69V821h69m1-1h-71v16h71V820Z" transform="translate(-88 -114)"/><rect x="1170.5" y="706.5" width="70" height="15" style="fill:#fff"/><path d="M1328,821v14h-69V821h69m1-1h-71v16h71V820Z" transform="translate(-88 -114)"/><rect x="1268.5" y="706.5" width="70" height="15" style="fill:#fff"/><path d="M1426,821v14h-69V821h69m1-1h-71v16h71V820Z" transform="translate(-88 -114)"/><rect x="1365.5" y="706.5" width="70" height="15" style="fill:#fff"/><path d="M1523,821v14h-69V821h69m1-1h-71v16h71V820Z" transform="translate(-88 -114)"/><rect x="1458.5" y="706.5" width="70" height="15" style="fill:#fff"/><path d="M1616,821v14h-69V821h69m1-1h-71v16h71V820Z" transform="translate(-88 -114)"/><rect x="1544.5" y="706.5" width="70" height="15" style="fill:#fff"/><path d="M1702,821v14h-69V821h69m1-1h-71v16h71V820Z" transform="translate(-88 -114)"/><text transform="translate(298.42 399.48)" style="font-size:36px;font-family:'Source Sans Pro', Helvetica, sans-serif"><tspan style="letter-spacing:0.009996202256944444em">H</tspan><tspan x="23.83" y="0">igh </tspan><tspan x="79.99" y="0" style="letter-spacing:-0.010986328125em">C</tspan><tspan x="100.47" y="0" style="letter-spacing:-0.006971571180555556em">o</tspan><tspan x="119.99" y="0" style="letter-spacing:-0.009996202256944444em">v</tspan><tspan x="136.94" y="0">e</tspan><tspan x="154.98" y="0" style="letter-spacing:-0.004991319444444444em">r</tspan><tspan x="166.57" y="0">age</tspan></text><text transform="translate(257.42 588.48)" style="font-size:36px;font-family:'Source Sans Pro', Helvetica, sans-serif"><tspan style="letter-spacing:0.005995008680555556em">M</tspan><tspan x="29.16" y="0" style="letter-spacing:0.000013563368055555555em">ode</tspan><tspan x="87.26" y="0" style="letter-spacing:-0.004991319444444444em">r</tspan><tspan x="98.85" y="0" style="letter-spacing:-0.004001193576388889em">a</tspan><tspan x="116.06" y="0" style="letter-spacing:-0.006008572048611111em">t</tspan><tspan x="127.76" y="0">e </tspan><tspan x="153.43" y="0" style="letter-spacing:-0.010986328125em">C</tspan><tspan x="173.91" y="0" style="letter-spacing:-0.006985134548611111em">o</tspan><tspan x="193.43" y="0" style="letter-spacing:-0.009982638888888888em">v</tspan><tspan x="210.38" y="0">e</tspan><tspan x="228.42" y="0" style="letter-spacing:-0.004991319444444444em">r</tspan><tspan x="240.01" y="0">age</tspan></text><text transform="translate(309.42 775.48)" style="font-size:36px;font-family:'Source Sans Pro', Helvetica, sans-serif"><tspan style="letter-spacing:-0.013997395833333334em">L</tspan><tspan x="16.49" y="0" style="letter-spacing:-0.006985134548611111em">o</tspan><tspan x="36" y="0">w </tspan><tspan x="70.13" y="0" style="letter-spacing:-0.010986328125em">C</tspan><tspan x="90.61" y="0" style="letter-spacing:-0.006985134548611111em">o</tspan><tspan x="110.12" y="0" style="letter-spacing:-0.009982638888888888em">v</tspan><tspan x="127.08" y="0">e</tspan><tspan x="145.12" y="0" style="letter-spacing:-0.004991319444444444em">r</tspan><tspan x="156.71" y="0">age</tspan></text><polygon points="739.59 380 913.5 389.5 739.41 395 739.59 380" style="fill:#fff"/><polygon points="738.09 567 912 576.5 737.91 582 738.09 567" style="fill:#fff"/><polygon points="738.09 757 912 766.5 737.91 772 738.09 757" style="fill:#fff"/></svg>
+					</section>
+					<section>
+						<h4>Preprocessing: Diginorm</h4>
+						<p class="fragment">Why bother to do this?</p>
+						<ul>
+							<li class="fragment">More depth is not always better. There is a "sweet spot"</li>
+							<li class="fragment">Assembly is a hungry hungry hippo (in terms of compute resources). Fewer (but good) reads means faster assemblies.</li>
+						</ul>
+					</section>
+					<section>
+						<img class="stretch" data-src="img/diginorm.png">
+						<p class="citation">Haas, Brian J., et al. "De novo transcript sequence reconstruction from RNA-seq using the Trinity platform for reference generation and analysis." Nature protocols 8.8 (2013): 1494.</p>
+					</section>
+					<section>
+						<h4>Trimming</h4>
+						<ul>
+						<li class="fragment">Quality trimming is beneficial to correctness</li>
+						<li class="fragment">BUT: Trimming is detrimental to completeness</li>
+						<li class="fragment warn">Trim conservatively!</li>
+						<li class="fragment warn">Adapter trimming is mandatory</li>
+						</ul>
+					</section>
+					<section>
+						<div class="stretch" id='hc1'></div>
+					</section>
+					<section data-background="white">
+						<img  class="stretch" data-src="img/qtre.png">
+					</section>
+					<section data-background="white">
+						<img class="stretch" data-src="img/qtcds.png">
+					</section>
+					<section data-background="white">
+						<h4>Error Correction</h4>
+						<img class="stretch" data-src="img/errcorr.png">
+					</section>
+				</section>
+				<section>
+					<section>
+						<h4>Assembly</h4>
+						<p class="fragment">Many Assemblers</p>
+						<ul>
+							<li class="fragment">Trinity</li>
+							<li class="fragment">Spades</li>
+							<li class="fragment">Shannon</li>
+							<li class="fragment">TransABySS, Oases, SOAP, Bridger, Binpacker, IDBA-tran</li>
+						</ul>
+						<p class="fragment">Which is best?</p>
+					</section>
+					<section data-background="white">
+						<img data-src="img/ascmp.png" class="stretch"></img>
+					</section>
+					<section>
+						<h4>Which assembler is best</h4>
+						<table class="medium">
+							<thead>
+								<tr>
+									<td>Assembly</td><td>Sum</td><td>Missing</td><td>Unique</td>
+								</tr>
+							</thead>
+							<tbody>
+								<tr><td>All</td><td>14674 ± 3590</td><td></td><td></td></tr>
+								<tr><td>Spades55</td><td></td><td>-1739 ± 758</td><td>570 ± 266</td></tr>
+								<tr><td>Spades75</td><td></td><td>-2711 ± 2047</td><td>301 ± 195</td></tr>
+								<tr><td>Shannon</td><td></td><td>-4375 ± 3508</td><td>302 ± 241</td></tr>
+								<tr><td>Trinity</td><td></td><td>-1952 ± 803</td><td>520 ± 301</td></tr>
+							</tbody>
+						</table>
+					</section>
+				</section>
+				<section>
+					<h4>Practical!</h4>
+					<!-- <p>We will be running Matt's <a href="http://oyster-river-protocol.rtfd.io">Oyster River Protocol</a> on our data. The ORP works in three steps:</p>
+					<ul>
+						<li class="fragment">Error Correction (RCorrector)</li>
+						<li class="fragment">Trimming (Trimmomatic, Phred=5)</li>
+						<li class="fragment">Assembly (SPAdes (k=55,75), TransABySS, Trinity)</li>
+					</ul>
+					<p class="fragment">It then uses <a href="https://github.com/macmanes-lab/Oyster_River_Protocol/blob/master/orthofuser-README.md">orthofuser</a> to merge the output.</p> -->
+				</section>
+			</div>
+		</div>
+		<script>hljs.initHighlightingOnLoad();</script>
+		
+		<script type="text/javascript">
+			$(document).ready(function(){
+				let pbsq = [["1", [31.498648637592147, 31.0, 31.0, 34.0, 30.0, 34.0]], ["2", [31.77277384293287, 31.0, 31.0, 34.0, 30.0, 34.0]], ["3", [31.538899510091355, 31.0, 31.0, 34.0, 30.0, 34.0]], ["4", [35.36805330176973, 37.0, 35.0, 37.0, 33.0, 37.0]], ["5", [35.31779425655068, 37.0, 35.0, 37.0, 33.0, 37.0]], ["6", [35.315673349387865, 37.0, 35.0, 37.0, 32.0, 37.0]], ["7", [35.47626865793758, 37.0, 35.0, 37.0, 33.0, 37.0]], ["8", [35.446934139150784, 37.0, 35.0, 37.0, 33.0, 37.0]], ["9", [37.02159907127357, 39.0, 37.0, 39.0, 33.0, 39.0]], ["10-11", [36.954707768447484, 39.0, 37.0, 39.0, 33.0, 39.0]], ["12-13", [36.914007805447454, 39.0, 37.0, 39.0, 33.0, 39.0]], ["14-15", [38.08057583584015, 40.0, 37.0, 41.0, 33.0, 41.0]], ["16-17", [37.987898647364865, 40.0, 37.0, 41.0, 33.0, 41.0]], ["18-19", [37.87860829217428, 40.0, 37.0, 41.0, 32.5, 41.0]], ["20-21", [37.74143705323904, 40.0, 37.0, 41.0, 32.0, 41.0]], ["22-23", [37.519037709965716, 39.0, 36.5, 41.0, 32.0, 41.0]], ["24-25", [37.27722565706758, 39.0, 36.0, 41.0, 31.0, 41.0]], ["26-27", [36.95552731315699, 39.0, 36.0, 40.0, 31.0, 41.0]], ["28-29", [36.80336699693909, 39.0, 36.0, 40.0, 30.0, 41.0]], ["30-31", [36.67368120574436, 39.0, 36.0, 40.0, 30.0, 41.0]], ["32-33", [36.403780542017685, 38.0, 35.0, 40.0, 30.0, 41.0]], ["34-35", [36.22605388540556, 38.0, 35.0, 40.0, 30.0, 41.0]], ["36-37", [35.96304594268551, 38.0, 35.0, 40.0, 29.0, 41.0]], ["38-39", [35.891923734614785, 38.0, 34.5, 40.0, 28.5, 41.0]], ["40-41", [36.05813494715005, 38.0, 35.0, 40.0, 29.0, 41.0]], ["42-43", [35.995334095150824, 38.0, 35.0, 40.0, 29.0, 41.0]], ["44-45", [35.79452018679983, 38.0, 34.5, 40.0, 28.0, 41.0]], ["46-47", [35.618876255567045, 38.0, 34.0, 40.0, 27.0, 41.0]], ["48-49", [35.348127865338306, 38.0, 34.0, 40.0, 27.0, 41.0]], ["50-51", [35.10870808299265, 38.0, 33.0, 40.0, 26.0, 41.0]], ["52-53", [34.83476333203333, 38.0, 33.0, 40.0, 26.0, 41.0]], ["54-55", [34.53745360231491, 38.0, 33.0, 40.0, 25.5, 41.0]], ["56-57", [34.17318438801419, 37.0, 32.5, 40.0, 24.5, 41.0]], ["58-59", [33.840602417634166, 37.0, 32.0, 39.5, 23.5, 41.0]], ["60-61", [33.40328463337761, 36.5, 31.0, 39.0, 23.0, 40.0]], ["62-63", [33.03281906107358, 36.0, 31.0, 39.0, 22.0, 40.0]], ["64-65", [32.46043321778798, 35.5, 30.5, 39.0, 21.5, 40.0]], ["66-67", [32.07344902413725, 35.0, 30.0, 38.0, 20.0, 40.0]], ["68-69", [31.879968290937917, 35.0, 30.0, 38.0, 20.0, 40.0]], ["70-71", [31.392158279856112, 34.5, 29.5, 37.5, 18.5, 39.5]], ["72-73", [30.78617928529156, 34.0, 29.0, 37.0, 16.5, 39.0]], ["74-75", [30.159384400559638, 34.0, 29.0, 36.0, 12.0, 39.0]], ["76-77", [29.17999347273321, 32.5, 27.5, 35.0, 9.5, 37.0]], ["78-79", [29.409971900025546, 34.0, 29.0, 35.0, 7.5, 37.0]], ["80-81", [29.055242677052114, 33.5, 28.5, 35.0, 6.5, 37.0]], ["82-83", [28.44690232099789, 33.0, 27.0, 35.0, 2.0, 36.0]], ["84-85", [27.73054933586424, 32.5, 26.0, 35.0, 2.0, 36.0]], ["86-87", [27.07769356573312, 32.0, 25.5, 34.5, 2.0, 35.5]], ["88-89", [26.4540336781512, 32.0, 25.0, 34.0, 2.0, 35.0]], ["90-91", [25.869775572931296, 31.5, 23.5, 34.0, 2.0, 35.0]], ["92-93", [25.066602666724847, 31.0, 20.0, 34.0, 2.0, 35.0]], ["94-95", [24.096488548646775, 31.0, 16.0, 34.0, 2.0, 35.0]], ["96-97", [23.261887943738234, 30.0, 4.5, 34.0, 2.0, 35.0]], ["98-99", [22.336443785051102, 30.0, 2.0, 34.0, 2.0, 35.0]], ["100-101", [20.334681059380856, 27.0, 2.0, 33.0, 2.0, 34.5]]];
+
+					Reveal.addEventListener( 'slidechanged', function( event ) {
+						console.log(event);
+						if (event.indexh === 7 && event.indexv === 4){
+						window.chart_hc1 = Highcharts.chart('hc1', {
+										chart: {
+											type: 'boxplot'
+										},
+										legend: {
+											enabled: false
+										},
+								yAxis: {
+									title: {
+										text: 'PHRED Score'
+									}
+								},
+										xAxis: {
+								categories: pbsq.map(x => x[0]),
+								},
+										title: {
+											text: "Per Base Sequence Quality"
+										},
+										series: [{ name: "", data: pbsq.map(x => [x[1][4], x[1][2], x[1][1], x[1][3], x[1][5]])},
+										         { name: "P25", type: 'line', data: pbsq.map(x => 25)},
+										         { name: "P15", type: 'line', data: pbsq.map(x => 15)},
+										         { name: "P5", type: 'line', data: pbsq.map(x => 5)}]
+									});
+						window.dispatchEvent(new Event('resize'));
+						}
+					});
+
+			});
+		</script>
+		<script src="reveal.js/dist/reveal.js"></script>
+		<script src="reveal.js/plugin/notes/notes.js"></script>
+		<script src="reveal.js/plugin/markdown/markdown.js"></script>
+		<script src="reveal.js/plugin/highlight/highlight.js"></script>
+		<script src="reveal.js/plugin/math/math.js"></script>
+		<script>
+			// More info about initialization & config:
+			// - https://revealjs.com/initialization/
+			// - https://revealjs.com/config/
+			Reveal.initialize({
+				hash: true,
+				width: 1280,
+				height: 720,
+
+				// Learn about plugins: https://revealjs.com/plugins/
+				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes, RevealMath ]
+			});
+		</script>
+	</body>
+</html>
