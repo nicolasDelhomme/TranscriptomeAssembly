@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-		<title>QC</title>
+		<title>Transcriptome Assembly</title>
 		<link rel="stylesheet" href="reveal.js/dist/reset.css">
 		<link rel="stylesheet" href="reveal.js/dist/reveal.css">
 		<link rel="stylesheet" href="reveal.js/dist/theme/night.css" id="theme">
@@ -16,7 +16,7 @@
 		<script src="https://code.highcharts.com/modules/sankey.js"></script>
 		<script src="https://code.highcharts.com/modules/heatmap.js"></script>
 		<script src="https://code.highcharts.com/modules/exporting.js"></script>
-		<script src="http://code.highcharts.com/gantt/modules/networkgraph.js"></script>
+		<script src="https://code.highcharts.com/gantt/modules/networkgraph.js"></script>
 		<script type="text/javascript" src="js/high-contrast-dark.js"></script>
 		<script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 		<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css">
@@ -28,10 +28,9 @@
 		<div class="reveal">
 			<div class="slides">
 				<section>
-					<h2>Day 2 - Transcriptome Assembly</h2>
+					<h2>Transcriptome Assembly</h2>
 					<p>Bastian Schiffthaler, Nicolas Delhomme</p>
 					<p>And <strong style="text-decoration: underline;">a lot</strong> of content courtesy of Matt MacManes (@macmanes)</p>
-					<p>Berlin, November 12th 2019</p>
 				</section>
 				<section>
 					<h4>Overview</h4>
@@ -151,7 +150,7 @@
 						<li class="fragment warn">Adapter trimming is mandatory</li>
 						</ul>
 					</section>
-					<section>
+					<section id="p-hc1">
 						<div class="stretch" id='hc1'></div>
 					</section>
 					<section data-background="white">
@@ -199,14 +198,24 @@
 					</section>
 				</section>
 				<section>
+					<section>
 					<h4>Practical!</h4>
-					<!-- <p>We will be running Matt's <a href="http://oyster-river-protocol.rtfd.io">Oyster River Protocol</a> on our data. The ORP works in three steps:</p>
-					<ul>
-						<li class="fragment">Error Correction (RCorrector)</li>
-						<li class="fragment">Trimming (Trimmomatic, Phred=5)</li>
-						<li class="fragment">Assembly (SPAdes (k=55,75), TransABySS, Trinity)</li>
-					</ul>
-					<p class="fragment">It then uses <a href="https://github.com/macmanes-lab/Oyster_River_Protocol/blob/master/orthofuser-README.md">orthofuser</a> to merge the output.</p> -->
+					<p>We will assemble a set of spruce mini transcriptomes (they will be bad). Your pipeline will be</p>
+					<p>Your data is in <code>~/raw_data/simulated</code>. Pick a library (pair)</p>
+					<ol>
+						<li><code>trimmomatic</code> - Adapter and very mild quality trimming</li>
+						<li><code>rcorrector</code> - Additional quality correction</li>
+						<li><code>Trinity</code> - Assembly (illumina only)</li>
+					</ol>
+					<a href="https://gist.github.com/bschiffthaler/9cd8c5c656981f94e99b9d790408a248">Markdown follow-along</a>
+				</section>
+				<section>
+					<p>To run <code>rcorrector</code></p>
+					<pre><code class="bash">#!/usr/bin/env bash
+cd ~
+wget https://raw.githubusercontent.com/mourisl/Rcorrector/master/run_rcorrector.pl
+ln -s $(which rcorrector) ~</code></pre>
+				</section>
 				</section>
 			</div>
 		</div>
@@ -217,8 +226,9 @@
 				let pbsq = [["1", [31.498648637592147, 31.0, 31.0, 34.0, 30.0, 34.0]], ["2", [31.77277384293287, 31.0, 31.0, 34.0, 30.0, 34.0]], ["3", [31.538899510091355, 31.0, 31.0, 34.0, 30.0, 34.0]], ["4", [35.36805330176973, 37.0, 35.0, 37.0, 33.0, 37.0]], ["5", [35.31779425655068, 37.0, 35.0, 37.0, 33.0, 37.0]], ["6", [35.315673349387865, 37.0, 35.0, 37.0, 32.0, 37.0]], ["7", [35.47626865793758, 37.0, 35.0, 37.0, 33.0, 37.0]], ["8", [35.446934139150784, 37.0, 35.0, 37.0, 33.0, 37.0]], ["9", [37.02159907127357, 39.0, 37.0, 39.0, 33.0, 39.0]], ["10-11", [36.954707768447484, 39.0, 37.0, 39.0, 33.0, 39.0]], ["12-13", [36.914007805447454, 39.0, 37.0, 39.0, 33.0, 39.0]], ["14-15", [38.08057583584015, 40.0, 37.0, 41.0, 33.0, 41.0]], ["16-17", [37.987898647364865, 40.0, 37.0, 41.0, 33.0, 41.0]], ["18-19", [37.87860829217428, 40.0, 37.0, 41.0, 32.5, 41.0]], ["20-21", [37.74143705323904, 40.0, 37.0, 41.0, 32.0, 41.0]], ["22-23", [37.519037709965716, 39.0, 36.5, 41.0, 32.0, 41.0]], ["24-25", [37.27722565706758, 39.0, 36.0, 41.0, 31.0, 41.0]], ["26-27", [36.95552731315699, 39.0, 36.0, 40.0, 31.0, 41.0]], ["28-29", [36.80336699693909, 39.0, 36.0, 40.0, 30.0, 41.0]], ["30-31", [36.67368120574436, 39.0, 36.0, 40.0, 30.0, 41.0]], ["32-33", [36.403780542017685, 38.0, 35.0, 40.0, 30.0, 41.0]], ["34-35", [36.22605388540556, 38.0, 35.0, 40.0, 30.0, 41.0]], ["36-37", [35.96304594268551, 38.0, 35.0, 40.0, 29.0, 41.0]], ["38-39", [35.891923734614785, 38.0, 34.5, 40.0, 28.5, 41.0]], ["40-41", [36.05813494715005, 38.0, 35.0, 40.0, 29.0, 41.0]], ["42-43", [35.995334095150824, 38.0, 35.0, 40.0, 29.0, 41.0]], ["44-45", [35.79452018679983, 38.0, 34.5, 40.0, 28.0, 41.0]], ["46-47", [35.618876255567045, 38.0, 34.0, 40.0, 27.0, 41.0]], ["48-49", [35.348127865338306, 38.0, 34.0, 40.0, 27.0, 41.0]], ["50-51", [35.10870808299265, 38.0, 33.0, 40.0, 26.0, 41.0]], ["52-53", [34.83476333203333, 38.0, 33.0, 40.0, 26.0, 41.0]], ["54-55", [34.53745360231491, 38.0, 33.0, 40.0, 25.5, 41.0]], ["56-57", [34.17318438801419, 37.0, 32.5, 40.0, 24.5, 41.0]], ["58-59", [33.840602417634166, 37.0, 32.0, 39.5, 23.5, 41.0]], ["60-61", [33.40328463337761, 36.5, 31.0, 39.0, 23.0, 40.0]], ["62-63", [33.03281906107358, 36.0, 31.0, 39.0, 22.0, 40.0]], ["64-65", [32.46043321778798, 35.5, 30.5, 39.0, 21.5, 40.0]], ["66-67", [32.07344902413725, 35.0, 30.0, 38.0, 20.0, 40.0]], ["68-69", [31.879968290937917, 35.0, 30.0, 38.0, 20.0, 40.0]], ["70-71", [31.392158279856112, 34.5, 29.5, 37.5, 18.5, 39.5]], ["72-73", [30.78617928529156, 34.0, 29.0, 37.0, 16.5, 39.0]], ["74-75", [30.159384400559638, 34.0, 29.0, 36.0, 12.0, 39.0]], ["76-77", [29.17999347273321, 32.5, 27.5, 35.0, 9.5, 37.0]], ["78-79", [29.409971900025546, 34.0, 29.0, 35.0, 7.5, 37.0]], ["80-81", [29.055242677052114, 33.5, 28.5, 35.0, 6.5, 37.0]], ["82-83", [28.44690232099789, 33.0, 27.0, 35.0, 2.0, 36.0]], ["84-85", [27.73054933586424, 32.5, 26.0, 35.0, 2.0, 36.0]], ["86-87", [27.07769356573312, 32.0, 25.5, 34.5, 2.0, 35.5]], ["88-89", [26.4540336781512, 32.0, 25.0, 34.0, 2.0, 35.0]], ["90-91", [25.869775572931296, 31.5, 23.5, 34.0, 2.0, 35.0]], ["92-93", [25.066602666724847, 31.0, 20.0, 34.0, 2.0, 35.0]], ["94-95", [24.096488548646775, 31.0, 16.0, 34.0, 2.0, 35.0]], ["96-97", [23.261887943738234, 30.0, 4.5, 34.0, 2.0, 35.0]], ["98-99", [22.336443785051102, 30.0, 2.0, 34.0, 2.0, 35.0]], ["100-101", [20.334681059380856, 27.0, 2.0, 33.0, 2.0, 34.5]]];
 
 					Reveal.addEventListener( 'slidechanged', function( event ) {
-						console.log(event);
-						if (event.indexh === 7 && event.indexv === 4){
+						let curSlide = Reveal.getCurrentSlide();
+						let curId = $(curSlide).attr('id');
+						if (curId === 'p-hc1'){
 						window.chart_hc1 = Highcharts.chart('hc1', {
 										chart: {
 											type: 'boxplot'
