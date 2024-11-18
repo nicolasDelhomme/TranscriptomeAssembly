@@ -29,7 +29,8 @@
 			<div class="slides">
 				<section>
 					<h2>Transcriptome Assembly</h2>
-					<p>Bastian Schiffthaler, Nicolas Delhomme</p>
+					<p>Kristina Benevides, Nicolas Delhomme</p>
+					<p>Original slides from Bastian Schiffthaler</p>
 					<p>And <strong style="text-decoration: underline;">a lot</strong> of content courtesy of Matt MacManes (@macmanes)</p>
 				</section>
 				<section>
@@ -50,11 +51,6 @@
 						<li class="fragment">Your specific genes are missing</li>
 						<li class="fragment">You trust no one and want to QC an existing reference</li>
 					</ul>
-				</section>
-				<section>
-					<h4>Goal for today</h4>
-					<p class="fragment">You could plan or assist in the design and computational aspects of a transcriptome assembly study.</p>
-					<p class="fragment">You are informed about options/tools for short read assembly</p>
 				</section>
 				<section>
 					<section>
@@ -202,25 +198,10 @@
 				</section>
 				<section>
 					<section>
-					<h4>Practical!</h4>
-					<p>We will assemble a set of spruce mini transcriptomes (they will be bad). Your pipeline will be</p>
-					<p>Your data is in <code>~/raw_data/simulated</code>. Pick a library (pair)</p>
-					<ol>
-						<li><code>trimmomatic</code> - Adapter and very mild quality trimming</li>
-						<li><code>rcorrector</code> - Additional quality correction</li>
-						<li><code>Trinity</code> - Assembly (illumina only)</li>
-					</ol>
-					<p><a href="https://gist.github.com/bschiffthaler/9cd8c5c656981f94e99b9d790408a248">Markdown follow-along</a></p>
+					<h4>An assembly pipeline</h4>
 				</section>
 				<section>
 					<img width="300" src="https://mermaid.ink/svg/eyJjb2RlIjoiZ3JhcGggVERcbiAgICBBW1RyaW1tb21hdGljXSAtLT4gQltSQ29ycmVjdG9yXVxuICAgIEIgLS0-IENbVHJpbml0eV1cbiAgICBDIC0tPiBEW0JVU0NPXVxuICAgIEMgLS0-IEVbVHJhbnNSYXRlXVxuICAgIEMgLS0-IEZbRGV0b25hdGVdIiwibWVybWFpZCI6eyJ0aGVtZSI6ImRhcmsifSwidXBkYXRlRWRpdG9yIjpmYWxzZX0">
-				</section>
-				<section>
-					<p>To run <code>rcorrector</code></p>
-					<pre><code class="bash">#!/usr/bin/env bash
-cd ~
-wget https://raw.githubusercontent.com/mourisl/Rcorrector/master/run_rcorrector.pl
-ln -s $(which rcorrector) ~</code></pre>
 				</section>
 				</section>
 			</div>
